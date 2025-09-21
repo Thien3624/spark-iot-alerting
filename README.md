@@ -55,6 +55,7 @@ MQTT_PASSWORD=your-hivemq-password
 # Kafka Configuration
 KAFKA_BOOTSTRAP=kafka:9092
 KAFKA_TOPIC=iot_temperature
+```
 
 ## Hướng dẫn chạy
 
