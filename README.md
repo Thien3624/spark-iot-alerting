@@ -22,10 +22,10 @@ Một hệ thống streaming real-time để xử lý dữ liệu IoT từ cảm
 .
 ├── README.md
 ├── docker-compose.yml
+├── .env
 ├── simulator/
 │   ├── simulator.py
-│   ├── Dockerfile 
-│   └── .env
+│   └── Dockerfile 
 ├── bridge/
 │   ├── bridge-mqtt-kafka.py
 │   └──  Dockerfile
