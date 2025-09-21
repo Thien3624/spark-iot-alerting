@@ -99,14 +99,16 @@ docker exec -it spark-master spark-submit \
 
 ### Simulator logs:
 ```
-Published: {"temperature": 35.42, "timestamp": "2025-09-21T10:30:05Z"}
-Published: {"temperature": 42.18, "timestamp": "2025-09-21T10:30:07Z"}
+Published: {"temperature": 47.546545298410095}
+Published: {"temperature": 30.185404291496233}
+Published: {"temperature": 47.873790503879334}
 ```
 
 ### Bridge logs:
 ```
-Received MQTT message: {"temperature": 35.42, "timestamp": "2025-09-21T10:30:05Z"}
-Sent to Kafka topic 'iot_temperature'
+Bridge received: {"temperature": 21.474415574296223}
+Bridge received: {"temperature": 35.19160636551949}
+Bridge received: {"temperature": 40.46772075239557}
 ```
 
 ### Spark Streaming output:
