@@ -1,0 +1,94 @@
+services:
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
+    hostname: kafka
+    networks:
+      - shared-network
+    environment:
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092      
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD", "kafka-topics.sh", "--bootstrap-server=localhost:9092", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  spark-master:
+    image: bitnami/spark:3.5.4
+    container_name: spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    environment:
+      SPARK_MODE: master
+      SPARK_MASTER_HOST: spark-master
+      SPARK_MASTER_PORT: 7077
+    networks:
+      - shared-network
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./app:/opt/bitnami/spark/app
+
+  spark-worker:
+    image: bitnami/spark:3.5.4
+    container_name: spark-worker
+    hostname: spark-worker
+    depends_on:
+      - spark-master
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_CORES: 1
+      SPARK_WORKER_MEMORY: 2G
+      SPARK_DRIVER_MEMORY: 2G
+      SPARK_EXECUTOR_MEMORY: 2G
+    networks:
+      - shared-network
+
+  simulator:
+    build: ./simulator
+    env_file:
+      - .env
+    environment:
+      MQTT_BROKER: ${MQTT_BROKER}
+      MQTT_PORT: ${MQTT_PORT:-8883}
+      MQTT_USERNAME: ${MQTT_USERNAME}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
+      MQTT_TOPIC: ${MQTT_TOPIC:-iot/temperature}
+    networks:
+      - shared-network
+
+  bridge:
+    build: ./bridge
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MQTT_BROKER: ${MQTT_BROKER}
+      MQTT_PORT: ${MQTT_PORT:-8883}
+      MQTT_USERNAME: ${MQTT_USERNAME}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
+      MQTT_TOPIC: ${MQTT_TOPIC:-iot/temperature}
+      KAFKA_BOOTSTRAP: ${KAFKA_BOOTSTRAP:-kafka:9092}
+      KAFKA_TOPIC: ${KAFKA_TOPIC:-iot_temperature}
+    networks:
+      - shared-network
+
+networks:
+  shared-network:
+    driver: bridge
