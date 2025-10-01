@@ -71,6 +71,8 @@ docker compose up -d --build
 docker compose ps
 ```
 
+![Thiết kế chưa có tên](https://github.com/user-attachments/assets/b4ac7647-9454-4428-a96b-27eea8dca8f6)
+
 ### 3️. Kiểm tra Kafka topic đã được tạo
 
 ```bash
@@ -78,6 +80,8 @@ docker exec -it kafka kafka-topics.sh \
   --list \
   --bootstrap-server localhost:9092
 ```
+
+![Thiết kế chưa có tên (1)](https://github.com/user-attachments/assets/cffd1a28-d0de-4e40-8b73-3a3ec54324be)
 
 ### 4️. Xem dữ liệu từ Kafka (Optional)
 
@@ -88,13 +92,18 @@ docker exec -it kafka kafka-console-consumer.sh \
   --from-beginning
 ```
 
+![Thiết kế chưa có tên (3)](https://github.com/user-attachments/assets/da09f183-19c0-4db6-ab57-f28687efc9af)
+
 ### 6. Chạy Spark Streaming 
 
 ```bash
 docker exec -it spark-master spark-submit \
   --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.4 \
-  /opt/bitnami/spark/app/app.py
+  /opt/bitnami/spark/app/spark-app.py
 ```
+
+https://github.com/user-attachments/assets/3a698945-1ec7-4a96-a0f8-e896abb125d5
+
 
 ## 📊 Ví dụ output
 
